@@ -1,25 +1,62 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import axios from "axios";
+import "./App.css";
+import Search from "./components/Search";
+import ListMovies from "./components/ListMovies";
+import {Container} from 'react-bootstrap';
 
-function App() {
-  return (
+
+class App extends Component{
+  constructor(props){
+    super(props)
+    this.state = {
+      movies : [],
+      name : ''
+    }
+  }
+
+  componentDidMount(){
+    axios.get("http://www.omdbapi.com/?s=iron man&apikey=a5f2548a")
+    .then(res => {
+      
+      const data = res.data
+      this.setState({ movies : data })
+      // console.log(this.state.movies)
+    })
+    .catch(err =>console.log("ADA EROR LUR, " + err))
+  }
+
+  handleChange = (event) =>{
+    this.setState({
+      name : [event.target.value]
+    })
+  }
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+
+    axios.get(`http://www.omdbapi.com/?s=${this.state.name}&apikey=a5f2548a`)
+    .then(res => {
+      
+      const data = res.data
+      this.setState({ movies : data })
+      console.log(data)
+    })
+    .catch(err =>console.log("ADA EROR LUR, " + err))
+  }
+
+
+  render(){
+    const { movies } = this.state;
+    return(
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+      <Container>
+            <Search handleChange={this.handleChange} handleSubmit={this.handleSubmit}/>
+           <ListMovies movies={movies} />
+        </Container>
+      </div>
+    )}
 }
+
 
 export default App;
